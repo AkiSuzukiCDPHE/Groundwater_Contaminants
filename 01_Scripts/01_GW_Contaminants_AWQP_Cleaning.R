@@ -15,12 +15,13 @@ str(AWQP_Original)
 
 #### Section 2: Cleaning the data ####
 
-# Create dataframe to view the different well types
-AWQP_WellTypes <- as.data.frame(unique(AWQP_Original$SiteType))
+# Create data frame to view the different well types
+AWQP_WellTypes <- as.data.frame(unique(AWQP_Original_1$SiteType))
 
 # Filter variables
-AWQP_Original_1 <- AWQP_Original |> filter(SiteType != "(PZ) Piezometer",
-                                           ResultStatus == "Final")
+AWQP_Original_1 <- AWQP_Original |> filter(!SiteType %in% c("(PZ) Piezometer", "(SD) Spring Discharge"),
+                                           ResultStatus == "Final",
+                                           Units %in% c("mg/L","ug/L"))
 
 # Remove extraneous variables
 AWQP_Original_2 <- AWQP_Original_1 |> select(- c(ResultNote, ResultStatus))
@@ -45,6 +46,7 @@ AWQP_Merged_2 <- AWQP_Merged_1 |>  rename (Media=SiteGroup, SiteName=SiteName.x,
 AWQP_Merged_2 <- AWQP_Merged_2 |> mutate(NonDetect=case_when(NonDetect== 1 ~ "Not Detected",
                                                              NonDetect== 0 ~ "Detected"))
 
+
 # Making sure there are not duplicates
 unique_rows_AWQP <- AWQP_Merged_2 %>%
   group_by(SiteID) %>%
@@ -54,7 +56,10 @@ unique_rows_AWQP <- AWQP_Merged_2 %>%
 # Counting how many unique sample IDs there is (site IDs)
 length(unique(AWQP_Merged_2$SiteID))
 
+
+
+
 # # Exporting to view the dataset
-# library(writexl)
-# write_xlsx(AWQP_Merged_2,"02_Raw_Data/AWQP_Groundwater_Intermediate.xlsx")
+library(writexl)
+write_xlsx(AWQP_Merged_2,"02_Raw_Data/AWQP_Groundwater_CHECK.xlsx")
 

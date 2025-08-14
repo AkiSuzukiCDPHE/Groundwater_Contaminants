@@ -1,12 +1,4 @@
-
-
-
-
-
-
-
-
-#####  Section 1: Importing ####
+####  Section 1: Importing ####
 
 # Importing data from an excel workbook
 library(readxl)
@@ -16,13 +8,13 @@ getwd()
 
 # Importing data
 
-AWQP_Groundwater_Intermediate <- read_excel("02_Raw_Data/AWQP_Groundwater_Intermediate.xlsx")
+AWQP_Groundwater_Intermediate <- read_excel("02_Raw_Data/AWQP_Groundwater_CHECK.xlsx")
 
 
-ECMC_Wells_Intermediate <- read_excel("02_Raw_Data/ECMC_Wells_Intermediate.xlsx")
+ECMC_Wells_Intermediate <- read_excel("02_Raw_Data/ECMC_Wells_CHECK.xlsx")
 ECMC_Wells_Intermediate <- ECMC_Wells_Intermediate |>  filter(Units != "%")
 
-NWQMC_Wells_Intermediate <- read_excel("02_Raw_Data/NWQMC_Wells_Intermediate.xlsx")
+NWQMC_Wells_Intermediate <- read_excel("02_Raw_Data/NWQMC_Wells_CHECK.xlsx")
 
 
 #### Section 2: Merging ####
@@ -88,11 +80,8 @@ unique(GW_Merged3$PrimaryUsage)
 
 ####  Cleaning data - renaming variables, condensing variables, adding values when NA #####
 
-
-
-
-
-
+# Creating a unique identifier for each row
+GW_Merged3$Unique_ID <- 1:nrow(GW_Merged3)
 
 
 #### Categorizing analytes ####

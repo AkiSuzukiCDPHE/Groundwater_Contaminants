@@ -2,11 +2,12 @@
 
 # Importing data from an excel workbook
 library(readxl)
+library(dplyr)
 
 # Get the original file path
 getwd()
 
-# Importing data
+#### Section 1: Importing data ####
 
 AWQP_Groundwater_Intermediate <- read_excel("02_Raw_Data/AWQP_Groundwater_CHECK.xlsx")
 
@@ -15,6 +16,7 @@ ECMC_Wells_Intermediate <- read_excel("02_Raw_Data/ECMC_Wells_CHECK.xlsx")
 ECMC_Wells_Intermediate <- ECMC_Wells_Intermediate |>  filter(Units != "%")
 
 NWQMC_Wells_Intermediate <- read_excel("02_Raw_Data/NWQMC_Wells_CHECK.xlsx")
+
 
 
 #### Section 2: Merging ####
@@ -40,53 +42,73 @@ AWQP_Groundwater_Intermediate$Qualifier <- as.character(AWQP_Groundwater_Interme
 AWQP_Groundwater_Intermediate$Date <- as.Date(AWQP_Groundwater_Intermediate$Date)
 
 NWQMC_Wells_Intermediate$Result <- as.numeric(NWQMC_Wells_Intermediate$Result)
+NWQMC_Wells_Intermediate$Detection_Limit <- as.numeric(NWQMC_Wells_Intermediate$Detection_Limit)
 NWQMC_Wells_Intermediate$Date <- as.Date(NWQMC_Wells_Intermediate$Date)
 
 ECMC_Wells_Intermediate$SampleID <- as.character(ECMC_Wells_Intermediate$SampleID)
+ECMC_Wells_Intermediate <- ECMC_Wells_Intermediate |> rename("Detection_Limit" = "Detection_limit", "SiteID" = "FacilityID")
+ECMC_Wells_Intermediate$SiteID <- as.character(ECMC_Wells_Intermediate$SiteID)
 
 
 # Merging using bind_rows
 GW_Merged <- bind_rows(ECMC_Wells_Intermediate, AWQP_Groundwater_Intermediate)
 
-
 GW_Merged2 <- bind_rows (GW_Merged, NWQMC_Wells_Intermediate)
 
-# Reordering columns
+
+
+####  Section 3: Cleaning data - renaming variables, condensing variables, adding values when NA #####
+
+
+# Reordering columns in merged df
 GW_Merged3 <- GW_Merged2 |>  select(
   Source,
+  OrganizationFormalName,
   Media,
   SiteType,
   PrimaryUsage,
-  Date,
+  SiteName,
+  SiteID,
+  PermitNumber,
   SampleID,
+  ResultID,
+  Date,
+  Sampling_Length,
   Analyte,
   AnalyteType,
   Result,
   Units,
   Qualifier,
+  QualifierType,
   NonDetect,
-  DetectionLimit,
+  Detection_Limit_Type,
+  Detection_Limit,
+  Detection_Limit_Unit,
+  DetectFrequency,
+  ResultSampleFractionText,
+  ResultStatusIdentifier,
   MonitoringRegion,
+  County,
   Longitude,
   Latitude,
-  SiteID,
   everything()
 )
 
 
-unique(GW_Merged3$PrimaryUsage)
+# Renaming variables and removing others
+GW_Merged4 <- GW_Merged3 |> rename("QA_QC_Status" = "ResultStatusIdentifier", "Result_Statistic" =
+                                     "StatisticalBaseCode") |> select(-c(ActivityTypeCode, SiteName))
 
 
-
-####  Cleaning data - renaming variables, condensing variables, adding values when NA #####
 
 # Creating a unique identifier for each row
-GW_Merged3$Unique_ID <- 1:nrow(GW_Merged3)
+GW_Merged4$Unique_ID <- 1:nrow(GW_Merged4)
 
 
-#### Categorizing analytes ####
+#### Section 4: Categorizing analytes ####
 
-Physical_Parameters <- c("WATER",
+Physical_Parameters <- c(
+  "WATER",
   "RESISTIVITY",
   "PH Electrometric Method",
   "Total solids",
@@ -264,7 +286,8 @@ Physical_Parameters <- c("WATER",
 
 
 
-Gases <- c("Sulfur Dioxide",
+Gases <- c(
+  "Sulfur Dioxide",
   "HYDROGEN CYANIDE",
   "SULFIDE as H2S",
   "SULFUR DIOXIDE",
@@ -368,7 +391,8 @@ Gases <- c("Sulfur Dioxide",
 
 
 
-VOCs <- c("1,2,3-Trimethylbenzene",
+VOCs <- c(
+  "1,2,3-Trimethylbenzene",
   "1,2,3-TRIMETHYLBENZENE",
   "m-XYLENE",
   "TOLUENE MONOOXYGENASE FUNCTIONAL GENE",
@@ -786,7 +810,9 @@ Fuels_Hydrocarbon_Mixtures <- c(
 
 
 
-Other_Organics <- c("Disulfoton","Total Coliform",
+Other_Organics <- c(
+  "Disulfoton",
+  "Total Coliform",
   "BACTERIA, IRON RELATED",
   "BACTERIA, SLIME FORMING",
   "BACTERIA, SULFATE REDUCING",
@@ -1716,7 +1742,9 @@ Other_Organics <- c("Disulfoton","Total Coliform",
 
 
 
-Metals_and_Elements <- c("Sulfate", "Cesium",
+Metals_and_Elements <- c(
+  "Sulfate",
+  "Cesium",
   "cesium",
   "Arsenite",
   "Arsenate",
@@ -2197,10 +2225,10 @@ Isotopic_Ratios <- c(
 )
 
 
-#### Assigning analyte categories #####
+#### Section 5: Assigning analyte categories #####
 
 # Create a variable that identifies when an analyte is physical versus contaminant
-GW_Merged4 <- GW_Merged3 |>
+GW_Merged5 <- GW_Merged4 |>
   mutate(
     Analyte_Sub_Category = case_when(
       Analyte %in% Physical_Parameters ~ "Physical Parameters",
@@ -2220,7 +2248,7 @@ GW_Merged4 <- GW_Merged3 |>
     )
   )
 
-GW_Merged_5 <- GW_Merged4 |>
+GW_Merged6 <- GW_Merged5 |>
   mutate(
     Analyte_Category = case_when(
       Analyte_Sub_Category %in% c("Physical Parameters", "Gases") ~ "Physical Water Properties",
@@ -2238,32 +2266,62 @@ GW_Merged_5 <- GW_Merged4 |>
   )
 
 
-##### Subsetting data into different category datasets
+#### Section 6: More cleaning ####
 
-GW_Merged_6 <- GW_Merged5 |>  filter(Analyte_Sub_Category != "Physical Parameters")
+# Removing the physical water properties and relocating variables
+GW_Merged7 <- GW_Merged6 |>  filter(Analyte_Category != "Physical Water Properties") |>
+  relocate(c(Analyte_Category, Analyte_Sub_Category), .after = Analyte) |>  select(-AnalyteType)
 
-
-
-unique(Other_Analytes3)
-# Export to CSV because excel doesn't work for over 1 million observations
-write.csv(Other_Analytes2,
-          "02_Raw_Data/Other_Analytes2.csv",
-          row.names = FALSE)
+unique(GW_Merged7$Qualifier)
 
 
-# Keep rows where AnalyteType is not 'Physical' OR where AnalyteType is NA.
+##### Section 7: Sub-setting data into different category data sets ####
 
-GW_MERGED_INTERMEDIATE <- GW_Merged3 |>
-  filter(AnalyteType != "Physical" | is.na(AnalyteType))
+GW_Organic_Contaminants <- GW_Merged7 |> filter(Analyte_Category == "Organic Contaminants")
+
+GW_NON_Organic_Contaminants <- GW_Merged7 |> filter(Analyte_Category == "Non-Organic Contaminants")
+
+GW_Nutrients <- GW_Merged7 |> filter(Analyte_Category == "Nutrients")
+
+GW_Radioactive <- GW_Merged7 |> filter(Analyte_Category == "Radiochemical")
+
+GW_OtherAnalytes <- GW_Merged7 |> filter(Analyte_Category == "Other Analytes")
 
 
-unique(GW_MERGED_INTERMEDIATE$AnalyteType)
 
 
-# Create a vector to identify all the different analyte types
-Analytes <- GW_MERGED_INTERMEDIATE |>  select(Analyte, Source)
+#### Section 8 : Exporting ####
 
-Analytes_1 <- unique(Analytes)
+# Export into separate excel files
+
+library(writexl)
+
+write_xlsx(GW_Merged7, "02_Raw_Data/GW_Merged_All.xlsx")
+
+write_xlsx(GW_OtherAnalytes, "02_Raw_Data/GW_OtherAnalytes.xlsx")
+
+write_xlsx(GW_Radioactive, "02_Raw_Data/GW_Radioactive.xlsx")
+
+write_xlsx(GW_Nutrients, "02_Raw_Data/GW_Nutrients.xlsx")
+
+write_xlsx(GW_NON_Organic_Contaminants,
+           "02_Raw_Data/GW_NON_Organic_Contaminants.xlsx")
+
+write_xlsx(GW_Organic_Contaminants,
+           "02_Raw_Data/GW_Organic_Contaminants.xlsx")
+
+
+
+# write.csv(GW_OtherAnalytes,
+#           "02_Raw_Data/GW_OtherAnalytes.csv",
+#           row.names = FALSE)
+# 
+# write.csv()
+
+
+
+
+
 
 
 
@@ -2282,9 +2340,17 @@ write.csv(GW_MERGED_INTERMEDIATE,
 
 
 
-#### Summarizing the Data ####
+#### EXTRA ####
 
 GW_Merged3 <- GW_Merged3 |>  mutate
+
+
+
+
+
+
+
+
 
 
 DF <- DF |>

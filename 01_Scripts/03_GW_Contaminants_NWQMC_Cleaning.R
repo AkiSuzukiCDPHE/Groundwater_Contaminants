@@ -4,14 +4,25 @@
 library(readxl)
 library(dplyr)
 library(lubridate)
+library(tidyverse)
+
+
+
 
 # Get the original file path
 getwd()
 
+
 # Section 1: Importing data ####
-NWQMC_Wells <- read_excel("02_Raw_Data/NWQMC_Wells.xlsx", na = c("", "N/A", "NULL"))
+NWQMC_Wells <- read_excel("02_Raw_Data/NWQMC_Wells.xlsx", 
+                          col_types = c(rep("guess", 38), "text", rep("guess", 43)))
+
+
 # View all variables and types
 str(NWQMC_Wells)
+
+
+glimpse(NWQMC_Wells)
 
 # View the class of variables
 class(NWQMC_Wells$MonitoringLocationName2)

@@ -8,15 +8,22 @@ library(dplyr)
 getwd()
 
 # Importing data
+
+
+17-12
+
+
 AWQP_Original <- read_excel("02_Raw_Data/AWQP_Groundwater.xlsx")
+
+AWQP_Original <- read_excel("02_Raw_Data/AWQP_Groundwater.xlsx",
+                            col_types = c(rep("guess", 12), "text", rep("guess", 4)))
+
+
 AWQP_Sites <- read_excel("02_Raw_Data/AWQP_Groundwater.xlsx", sheet=4)
 
 str(AWQP_Original)
 
 #### Section 2: Cleaning the data ####
-
-# Create data frame to view the different well types
-AWQP_WellTypes <- as.data.frame(unique(AWQP_Original_1$SiteType))
 
 # Filter variables
 AWQP_Original_1 <- AWQP_Original |> filter(!SiteType %in% c("(PZ) Piezometer", "(SD) Spring Discharge"),

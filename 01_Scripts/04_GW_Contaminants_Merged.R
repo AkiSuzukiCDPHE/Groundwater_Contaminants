@@ -9,13 +9,19 @@ getwd()
 
 #### Section 1: Importing data ####
 
-AWQP_Groundwater_Intermediate <- read_excel("02_Raw_Data/AWQP_Groundwater_CHECK.xlsx")
+AWQP_Groundwater_Intermediate <- read_excel("02_Raw_Data/AWQP_Groundwater_CHECK.xlsx",
+                                            col_types = c(rep("guess", 12), "text", rep("guess", 5)))
 
 
 ECMC_Wells_Intermediate <- read_excel("02_Raw_Data/ECMC_Wells_CHECK.xlsx")
+                                     
+
+
 ECMC_Wells_Intermediate <- ECMC_Wells_Intermediate |>  filter(Units != "%")
 
-NWQMC_Wells_Intermediate <- read_excel("02_Raw_Data/NWQMC_Wells_CHECK.xlsx")
+NWQMC_Wells_Intermediate <- read_excel("02_Raw_Data/NWQMC_Wells_CHECK.xlsx",
+                                       col_types = c(rep("guess", 10), "text", rep("guess", 12)))
+
 
 
 
@@ -107,7 +113,21 @@ GW_Merged4$Unique_ID <- 1:nrow(GW_Merged4)
 
 #### Section 4: Categorizing analytes ####
 
+GW_Merged4 <- GW_Merged4 |>  filter(!Analyte %in% c(
+  "Biomass, benthic",
+  "Depth, Secchi disk depth",
+  "Flow rate",
+  "Flow rate, instantaneous",
+  "Inorganic nitrogen (nitrate and nitrite) ***retired***use Nitrate + Nitrite",
+  "Number of sampling points",
+  "Oxidation reduction potential (ORP)",
+  "Precipitation",
+  "Temperature, air"))
+
 Physical_Parameters <- c(
+  "Depth to water level below land surface",
+  "Hardness, Ca, Mg",
+  "Temperature, water",
   "WATER",
   "RESISTIVITY",
   "PH Electrometric Method",
@@ -272,7 +292,8 @@ Physical_Parameters <- c(
   "MEASURED FLOW",
   "DEPTH TO WATER",
   "PURGE RATE",
-  "Foaming Agents"
+  "Foaming Agents",
+  "DOC - Dissolved Organic Carbon"
 )
 
 
@@ -812,15 +833,6 @@ Fuels_Hydrocarbon_Mixtures <- c(
 
 Other_Organics <- c(
   "Disulfoton",
-  "Total Coliform",
-  "BACTERIA, IRON RELATED",
-  "BACTERIA, SLIME FORMING",
-  "BACTERIA, SULFATE REDUCING",
-  "BACTERIA, TOTAL COLIFORM",
-  "BACTERIA, FECAL COLIFORM",
-  "Bacteria, Fecal + Total Coliform",
-  "BACTERIA, E COLI",
-  "Sulfate Reducing Bacteria Functional Gene DNA Expression",
   "Methanogen Phylogenetic Group DNA Expression",
   "Methane Oxidizing Bacteria Phylogenetic Group DNA Expression",
   "3-METHYLCHOLANTHRENE",
@@ -831,7 +843,6 @@ Other_Organics <- c(
   "3-+4-METHYLPHENOL",
   "SULFITE",
   "DISULFOTON",
-  "Total CYANIDE",
   "2,4,5-TP",
   "3-Hydroxycarbofuran",
   "Aldicarb",
@@ -901,7 +912,6 @@ Other_Organics <- c(
   "3,3'-Dichlorobenzidine",
   "2,4,5-Trichlorophenol",
   "MBAS",
-  "Bromide",
   "Carbofuran-D3",
   "Deethylatrazine-d6",
   "Diflubenzuron-d4",
@@ -1142,7 +1152,6 @@ Other_Organics <- c(
   "p-Nitrophenol",
   "Di(2-ethoxylhexyl) phthalate",
   "Dibutyl phthalate",
-  "Cyanide",
   "Oxazepam",
   "Lorazepam",
   ".delta.-Hexachlorocyclohexane",
@@ -1743,6 +1752,8 @@ Other_Organics <- c(
 
 
 Metals_and_Elements <- c(
+  "Cyanide",
+  "Bromide",
   "Sulfate",
   "Cesium",
   "cesium",
@@ -1750,8 +1761,6 @@ Metals_and_Elements <- c(
   "Arsenate",
   "Monomethylarsonate",
   "Cacodylic acid",
-  "U (Total) - Uranium Total",
-  "U - Uranium",
   "SULFIDE as H2S",
   "SILICA (SiO2)",
   "Silicon Dioxide",
@@ -1823,7 +1832,6 @@ Metals_and_Elements <- c(
   "Y - Yttrium",
   "SO4 - Sulfate",
   "Ca - Calcium",
-  "HCO3 - Bicarbonate",
   "Mg - Magnesium",
   "Cl - Chloride",
   "Al (Total) - Aluminum Total",
@@ -1864,7 +1872,6 @@ Metals_and_Elements <- c(
   "Be - Beryllium",
   "Sb (Total) - Antimony Total",
   "Tl - Thallium",
-  "CO3 - Carbonate",
   "Ag - Silver",
   "Calcium",
   "Magnesium",
@@ -1929,7 +1936,6 @@ Metals_and_Elements <- c(
   "TIN",
   "TITANIUM",
   "TUNGSTEN",
-  "URANIUM",
   "VANADIUM",
   "ZINC",
   "BISMUTH",
@@ -1962,7 +1968,6 @@ Metals_and_Elements <- c(
   "IODIDE ION",
   "SULFUR",
   "SULFIDE",
-  "CYANIDE",
   "CHLORIDE",
   "FLUORIDE",
   "CALCIUM",
@@ -2041,7 +2046,10 @@ PFAS <- c(
   "11-chloroeicosafluoro-3-oxaundecane-1-sulfonate"
 )
 
-
+Other_Nutrients <- c(
+  "Chlorophyll a, uncorrected for pheophytin",
+  "Chlorophyll b"
+)
 
 Nitrogen <- c(
   "Inorganic nitrogen (nitrate and nitrite)",
@@ -2109,7 +2117,6 @@ Carbon <- c(
   "Bicarbonate",
   "Inorganic carbon",
   "TOTAL ORGANIC CARBON",
-  "DOC - Dissolved Organic Carbon",
   "Organic carbon",
   "Total Organic Carbon",
   "Dissolved Organic Carbon",
@@ -2119,12 +2126,17 @@ Carbon <- c(
   "Carbonate as CaCO3",
   "Carbonate",
   "Total Kjeldahl nitrogen",
-  "Organic Carbon"
+  "Organic Carbon",
+  "CO3 - Carbonate",
+  "HCO3 - Bicarbonate"
 )
 
 
 
 Radionuclides <- c(
+  "URANIUM",
+  "U (Total) - Uranium Total",
+  "U - Uranium",
   "Beta particle",
   "Alpha particle",
   "Iodide",
@@ -2241,10 +2253,11 @@ GW_Merged5 <- GW_Merged4 |>
       Analyte %in% PFAS ~ "PFAS",
       Analyte %in% Nitrogen ~ "Nitrogen",
       Analyte %in% Phosphorus ~ "Phosphorus",
+      Analyte %in% Other_Nutrients ~ "Other Nutrients",
       Analyte %in% Carbon ~ "Carbon",
       Analyte %in% Radionuclides ~ "Radionuclides",
       Analyte %in% Isotopic_Ratios ~ "Isotopic Ratios",
-      TRUE ~ "Other Analytes"
+      TRUE ~ "Bacteria"
     )
   )
 
@@ -2255,13 +2268,14 @@ GW_Merged6 <- GW_Merged5 |>
       Analyte_Sub_Category %in% c(
         "Volatile Organic Compounds (VOCs)",
         "Polycyclic Aromatic Hydrocarbons (PAHs)",
+        "PFAS",
         "Fuels and Hydrocarbon Mixtures",
         "Other Organics"
       ) ~ "Organic Contaminants",
-      Analyte_Sub_Category %in% c("Metals and Other Elements", "PFAS") ~ "Non-Organic Contaminants",
-      Analyte_Sub_Category %in% c("Nitrogen", "Phosphorus", "Carbon") ~ "Nutrients",
+      Analyte_Sub_Category %in% c("Metals and Other Elements") ~ "Non-Organic Contaminants",
+      Analyte_Sub_Category %in% c("Nitrogen", "Phosphorus", "Carbon", "Other Nutrients") ~ "Nutrients",
       Analyte_Sub_Category %in% c("Radionuclides", "Isotopic Ratios") ~ "Radiochemical",
-      TRUE ~ "Other Analytes" # Catch-all for main category
+      TRUE ~ "Bacteria" # Catch-all for main category
     )
   )
 
@@ -2269,13 +2283,404 @@ GW_Merged6 <- GW_Merged5 |>
 #### Section 6: More cleaning ####
 
 # Removing the physical water properties and relocating variables
-GW_Merged7 <- GW_Merged6 |>  filter(Analyte_Category != "Physical Water Properties") |>
+GW_Merged7 <- GW_Merged6 |>  filter(Analyte_Category != "Physical Water Properties", Analyte_Sub_Category != "Isotopic Ratios") |>
   relocate(c(Analyte_Category, Analyte_Sub_Category), .after = Analyte) |>  select(-AnalyteType)
 
 unique(GW_Merged7$Qualifier)
 
 
-##### Section 7: Sub-setting data into different category data sets ####
+# Subsetting which analytes to keep
+GW_Merged8 <- GW_Merged7 |> filter (
+  Analyte %in% c(
+    "α-Endosulfan",
+    "1,1,1-TRICHLOROETHANE",
+    "1,1,2,2-TETRACHLOROETHANE",
+    "1,1,2-TRICHLOROETHANE",
+    "1,1-DICHLOROETHENE",
+    "1,2,3-TRICHLOROPROPANE",
+    "1,2,3-Trimethylbenzene",
+    "1,2,4-TRICHLOROBENZENE",
+    "1,2,4-TRIMETHYLBENZENE",
+    "1,2-DIBROMO-3-CHLOROPROPANE",
+    "1,2-DIBROMOETHANE",
+    "1,2-DICHLOROBENZENE",
+    "1,2-DICHLOROETHANE",
+    "1,2-DICHLOROETHANE-d4",
+    "1,2-DICHLOROPROPANE",
+    "1,3,5-TRIMETHYLBENZENE",
+    "1,3-DICHLOROBENZENE",
+    "1,4-DICHLOROBENZENE",
+    "1,4-DIOXANE",
+    "137Cesium",
+    "2,4,5-T",
+    "2,4,5-TP",
+    "2,4,5-TRICHLOROPHENOL",
+    "2,4,6-TRICHLOROPHENOL",
+    "2,4-D",
+    "2,4-DB",
+    "2,4-DICHLOROPHENOL",
+    "2,4-DIMETHYLPHENOL",
+    "2,4-DINITROPHENOL",
+    "2,4-DINITROTOLUENE",
+    "226RADIUM",
+    "228RADIUM",
+    "2-CHLOROPHENOL",
+    "2-HEXANONE",
+    "4-CHLORO-3-METHYLPHENOL",
+    "4-NITROPHENOL",
+    "ACENAPHTHENE",
+    "Acetochlor",
+    "ACETONE",
+    "ACROLEIN",
+    "ACRYLONITRILE",
+    "Ag - Silver",
+    "Al - Aluminum",
+    "Al (Total) - Aluminum Total",
+    "Alachlor",
+    "Aldicarb",
+    "Aldicarb sulfone",
+    "Aldicarb sulfoxide",
+    "Aldrin",
+    "Alpha BHC",
+    "Alpha emitting radium isotopes",
+    "Alpha particle",
+    "ALUMINUM",
+    "ANILINE",
+    "ANTHRACENE",
+    "ANTIMONY",
+    "ARSENIC",
+    "As - Arsenic",
+    "As (Total) - Arsenic Total",
+    "Atrazine",
+    "AZOBENZENE",
+    "B - Boron",
+    "Ba - Barium",
+    "Ba (Total) - Barium Total",
+    "BACTERIA, E COLI",
+    "BACTERIA, TOTAL COLIFORM",
+    "BARIUM",
+    "Be - Beryllium",
+    "BENZ(a)ANTHRACENE",
+    "BENZENE",
+    "BENZO(a)PYRENE",
+    "BENZO(b)FLUORANTHENE",
+    "BENZO(k)FLUORANTHENE",
+    "BERYLLIUM",
+    "Beta particle",
+    "bis(2-CHLOROETHOXY)METHANE",
+    "bis(2-CHLOROETHYL)ETHER",
+    "bis(2-CHLOROISOPROPYL)ETHER",
+    "bis(2-ETHYLHEXYL)PHTHALATE",
+    "BORON",
+    "Br - Bromide",
+    "BROMIDE",
+    "Bromide",
+    "BROMOBENZENE",
+    "BROMODICHLOROMETHANE",
+    "BROMOFORM",
+    "BUTYL BENZYL PHTHALATE",
+    "CADMIUM",
+    "Carbofuran",
+    "CARBON TETRACHLORIDE",
+    "Cd - Cadmium",
+    "Cd (Total) - Cadmium Total",
+    "Chlordane, technical",
+    "CHLORIDE",
+    "CHLOROBENZENE",
+    "CHLOROFORM",
+    "Chlorpyrifos",
+    "CHROMIUM",
+    "CHROMIUM III",
+    "CHROMIUM VI",
+    "Chromium(VI)",
+    "CHRYSENE",
+    "cis-1,2-DICHLOROETHENE",
+    "cis-1,2-Dichloroethylene",
+    "Co - Cobalt",
+    "Co (Total) - Cobalt Total",
+    "COBALT",
+    "Coliphage",
+    "COPPER",
+    "Cr - Chromium",
+    "Cr (Total) - Chromium Total",
+    "Cu - Copper",
+    "Cu (Total) - Copper Total",
+    "Cyanide",
+    "DDD",
+    "DDE",
+    "Depth to water level below land surface",
+    "DIBENZ(a,h)ANTHRACENE",
+    "DIBROMOCHLOROMETHANE",
+    "Dicamba",
+    "DICHLOROMETHANE (methylene chloride)",
+    "Dichlorvos",
+    "Dieldrin",
+    "DIETHYL PHTHALATE",
+    "DIMETHYL PHTHALATE",
+    "DI-n-BUTYL PHTHALATE",
+    "Endosulfan alpha",
+    "Endosulfan beta",
+    "Endrin",
+    "Enterococcus",
+    "Escherichia coli",
+    "ETHYLBENZENE",
+    "F - Fluoride",
+    "Fe - Iron",
+    "Fe (Total) - Iron Total",
+    "Ferrous ion",
+    "FLUORANTHENE",
+    "FLUORENE",
+    "FLUORIDE",
+    "gamma-HCH (Lindane)",
+    "Glyphosate",
+    "GROSS ALPHA",
+    "GROSS BETA",
+    "Heptachlor",
+    "Heptachlor epoxide",
+    "HEXACHLOROBENZENE",
+    "Hexachlorobutadiene",
+    "HEXACHLOROCYCLOPENTADIENE",
+    "HEXACHLOROETHANE",
+    "INDENO(1,2,3-cd)PYRENE",
+    "Inorganic nitrogen (nitrate and nitrite)",
+    "InorganicN - Inorganic N (NO3-N + NO2-N)",
+    "IRON",
+    "IRON, FIELD",
+    "ISOPHORONE",
+    "Isophorone",
+    "Kjeldahl nitrogen",
+    "LEAD",
+    "Lead-210",
+    "Li - Lithium",
+    "Lindane",
+    "LITHIUM",
+    "m,p-Xylene",
+    "M-+P-XYLENE",
+    "Malathion",
+    "MANGANESE",
+    "MERCURY",
+    "METHANOL",
+    "Methoxychlor",
+    "Methylene chloride",
+    "Methylmercury(1+)",
+    "Metribuzin",
+    "Mirex",
+    "Mn - Manganese",
+    "Mn (Total) - Manganese Total",
+    "Mo - Molybdenum",
+    "Mo (Total) - Molybdenum Total",
+    "MOLYBDENUM",
+    "Na - Sodium",
+    "Na (Total) - Sodium (Total)",
+    "NAPHTHALENE",
+    "NH3N - Ammonia (un-ionized) as Nitrogen",
+    "Ni - Nickel",
+    "Ni (Total) - Nickel Total",
+    "NICKEL",
+    "NITRATE",
+    "Nitrate + Nitrite",
+    "NITRATE AS N",
+    "NITRATE/NITRITE",
+    "NITRATE/NITRITE AS N",
+    "NITRITE",
+    "NITRITE AS N",
+    "Nitrite as NO2",
+    "NITROBENZENE",
+    "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)",
+    "N-methylperfluorooctane sulfonamidoacetic acid",
+    "N-NITROSODIMETHYLAMINE",
+    "N-NITROSO-di-n-PROPYLAMINE",
+    "N-NITROSODIPHENYLAMINE",
+    "NO2N - Nitrite as Nitrogen (NO2-N)",
+    "NO3N - Nitrate as Nitrogen (NO3-N)",
+    "o,p'-DDE",
+    "Organic Nitrogen",
+    "o-XYLENE",
+    "p,p'-DDD",
+    "p,p'-DDE",
+    "p,p'-DDT",
+    "Pb - Lead",
+    "Pb (Total) - Lead Total",
+    "PENTACHLOROPHENOL",
+    "Perchlorate",
+    "Perfluorohexanoate",
+    "Perfluoropentanoate",
+    "Perfluorotetradecanoic acid",
+    "PFOA ion",
+    "PHENOL",
+    "Phenols",
+    "Picloram",
+    "Plutonium-238",
+    "Plutonium-239 and Plutonium-240 combined",
+    "Polonium-210",
+    "Polychlorinated biphenyls",
+    "Prometon",
+    "PYRENE",
+    "Radium 226 + Radium 228",
+    "Radium-224",
+    "Radium-226",
+    "Radium-228",
+    "Radon-222",
+    "Sb - Antimony",
+    "Sb (Total) - Antimony Total",
+    "Se (Dissolved) - Selenium Dissolved",
+    "Se (Total) - Selenium Total",
+    "SELENIUM",
+    "SILVER",
+    "Silvex",
+    "Simazine",
+    "SO4 - Sulfate",
+    "Sr - Strontium",
+    "Sr (Total) - Strontium Total",
+    "STRONTIUM",
+    "Strontium-90",
+    "STYRENE",
+    "SULFATE",
+    "SULFIDE",
+    "TEPH DIESEL RANGE ORGANICS",
+    "TEPH Diesel Range Organics (extended)",
+    "TEPH MOTOR OIL RANGE ORGANICS",
+    "TETRACHLOROETHENE",
+    "Tetrachloroethylene",
+    "Tetrahydrofuran",
+    "THALLIUM",
+    "THORIUM",
+    "Thorium-230",
+    "Thorium-232",
+    "TN_Kjeldahl - Total Kjeldahl Nitrogen",
+    "TOLUENE",
+    "Total Coliform",
+    "TOTAL PETROLEUM HYDROCARBONS (sum of TVPH and TEPH)",
+    "TOTAL XYLENES",
+    "Toxaphene",
+    "trans-1,2-DICHLOROETHENE",
+    "trans-1,2-Dichloroethylene",
+    "TRICHLOROETHENE",
+    "Trichloroethylene",
+    "Trihalomethanes",
+    "TRITIUM",
+    "TVPH - Gasoline Range Organics",
+    "U - Uranium",
+    "U (Total) - Uranium Total",
+    "URANIUM",
+    "Uranium",
+    "V - Vanadium",
+    "VANADIUM",
+    "VINYL CHLORIDE",
+    "Xylene",
+    "ZINC",
+    "Zn - Zinc",
+    "Zn (Total) - Zinc Total"
+  )
+)
+
+
+GW_Merged9 <- GW_Merged8 |> 
+  mutate(Analyte = case_when(
+    Analyte == ".alpha.-Endosulfan" ~ "Endosulfan alpha",
+    Analyte == "1,1-DICHLOROETHENE" ~ "1,1-Dichlorocthylene",
+    Analyte == "1,2-DICHLOROETHANE-d4" ~ "1,2-Dichloroethane",
+    Analyte == "2,4,5-T" ~ "2,4,5-Trichlorophenol",
+    Analyte == "2,4,5-TP" ~ "2,4,5-Trichlorophenol",
+    Analyte == "2,4-DB" ~ "2,4-D",
+    Analyte == "226RADIUM" ~ "Radium-226",
+    Analyte == "228RADIUM" ~ "Radium-228",
+    Analyte == "Ag - Silver" ~ "Silver",
+    Analyte == "Al - Aluminum" ~ "Aluminum",
+    Analyte == "Al (Total) - Aluminum Total" ~ "Aluminum",
+    Analyte == "As - Arsenic" ~ "Arsenic",
+    Analyte == "As (Total) - Arsenic Total" ~ "Arsenic",
+    Analyte == "B - Boron" ~ "Boron",
+    Analyte == "Ba - Barium" ~ "Barium",
+    Analyte == "Ba (Total) - Barium Total" ~ "Barium",
+    Analyte == "Be - Beryllium" ~ "Beryllium",
+    Analyte == "BENZ(a)ANTHRACENE" ~ "Benzo(a)anthracene",
+    Analyte == "Br - Bromide" ~ "Bromide",
+    Analyte == "Cd - Cadmium" ~ "Cadmium",
+    Analyte == "Cd (Total) - Cadmium Total" ~ "Cadmium",
+    Analyte == "Chlordane, technical" ~ "Chlordane",
+    Analyte == "Chromium(VI)" ~ "Chromium VI",
+    Analyte == "cis-1,2-DICHLOROETHENE" ~ "cis-1,2-dichloroethylene",
+    Analyte == "Co - Cobalt" ~ "Cobalt",
+    Analyte == "Co (Total) - Cobalt Total" ~ "Cobalt",
+    Analyte == "Cr - Chromium" ~ "Chromium",
+    Analyte == "Cr (Total) - Chromium Total" ~ "Chromium",
+    Analyte == "Cu - Copper" ~ "Copper",
+    Analyte == "Cu (Total) - Copper Total" ~ "Copper",
+    Analyte == "DIBENZ(a,h)ANTHRACENE" ~ "Dibenzo(a,h)anthracene",
+    Analyte == "F - Fluoride" ~ "Fluoride",
+    Analyte == "Fe - Iron" ~ "Iron",
+    Analyte == "Fe (Total) - Iron Total" ~ "Iron",
+    Analyte == "Ferrous ion" ~ "Iron",
+    Analyte == "Inorganic nitrogen (nitrate and nitrite)" ~ "Inorganic nitrogen (Nitrate + Nitrite)",
+    Analyte == "InorganicN - Inorganic N (NO3-N + NO2-N)" ~ "Inorganic nitrogen (Nitrate + Nitrite)",
+    Analyte == "IRON, FIELD" ~ "Iron",
+    Analyte == "Li - Lithium" ~ "Lithium",
+    Analyte == "Lindane" ~ "gamma-HCH (Lindane)",
+    Analyte == "m,p-Xylene" ~ "Xylene",
+    Analyte == "M-+P-XYLENE" ~ "Xylene",
+    Analyte == "Methylene chloride" ~ "Dichloromethane (methylene chloride)",
+    Analyte == "Methylmercury(1+)" ~ "Mercury",
+    Analyte == "Mn - Manganese" ~ "Manganese",
+    Analyte == "Mn (Total) - Manganese Total" ~ "Manganese",
+    Analyte == "Mo - Molybdenum" ~ "Molybdenum",
+    Analyte == "Mo (Total) - Molybdenum Total" ~ "Molybdenum",
+    Analyte == "Na - Sodium" ~ "Sodium",
+    Analyte == "Na (Total) - Sodium (Total)" ~ "Sodium",
+    Analyte == "NH3N - Ammonia (un-ionized) as Nitrogen" ~ "Ammonia",
+    Analyte == "Ni - Nickel" ~ "Nickel",
+    Analyte == "Ni (Total) - Nickel Total" ~ "Nickel",
+    Analyte == "NITRATE AS N" ~ "Nitrate",
+    Analyte == "NITRATE/NITRITE" ~ "Inorganic nitrogen (Nitrate + Nitrite)",
+    Analyte == "NITRATE/NITRITE AS N" ~ "Inorganic nitrogen (Nitrate + Nitrite)",
+    Analyte == "NITRITE AS N" ~ "Nitrite",
+    Analyte == "Nitrite as NO2" ~ "Nitrite",
+    Analyte == "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)" ~ "Total nitrogen",
+    Analyte == "NO2N - Nitrite as Nitrogen (NO2-N)" ~ "Nitrite",
+    Analyte == "NO3N - Nitrate as Nitrogen (NO3-N)" ~ "Nitrate",
+    Analyte == "o,p'-DDE" ~ "DDE",
+    Analyte == "o-XYLENE" ~ "Xylene",
+    Analyte == "p,p'-DDD" ~ "DDD",
+    Analyte == "p,p'-DDE" ~ "DDE",
+    Analyte == "p,p'-DDT" ~ "DDT",
+    Analyte == "Pb - Lead" ~ "Lead",
+    Analyte == "Pb (Total) - Lead Total" ~ "Lead",
+    Analyte == "PFOA ion" ~ "Perfluorooctanoic acid",
+    Analyte == "Phenols" ~ "Phenol",
+    Analyte == "Plutonium-239 and Plutonium-240 combined" ~ "Plutonium 239 + 240",
+    Analyte == "Sb - Antimony" ~ "Antimony",
+    Analyte == "Sb (Total) - Antimony Total" ~ "Antimony",
+    Analyte == "Se (Dissolved) - Selenium Dissolved" ~ "Selenium",
+    Analyte == "Se (Total) - Selenium Total" ~ "Selenium",
+    Analyte == "SO4 - Sulfate" ~ "Sulfate",
+    Analyte == "Sr - Strontium" ~ "Strontium",
+    Analyte == "Sr (Total) - Strontium Total" ~ "Strontium",
+    Analyte == "TEPH Diesel Range Organics (extended)" ~ "TEPH Diesel Range Organics",
+    Analyte == "TETRACHLOROETHENE" ~ "Tetrachloroethylene",
+    Analyte == "TN_Kjeldahl - Total Kjeldahl Nitrogen" ~ "Kjeldahl nitrogen",
+    Analyte == "TOTAL XYLENES" ~ "Xylene",
+    Analyte == "trans-1,2-DICHLOROETHENE" ~ "trans-1,2-Dichloroethylene",
+    Analyte == "TRICHLOROETHENE" ~ "Trichloroethylene",
+    Analyte == "U - Uranium" ~ "Uranium",
+    Analyte == "U (Total) - Uranium Total" ~ "Uranium",
+    Analyte == "URANIUM" ~ "Uranium",
+    Analyte == "V - Vanadium" ~ "Vanadium",
+    Analyte == "Zn - Zinc" ~ "Zinc",
+    Analyte == "Zn (Total) - Zinc Total" ~ "Zinc",
+    TRUE ~ Analyte
+  ))
+
+
+glimpse(GW_Merged9)
+length(unique(GW_Merged9$Analyte))
+
+# Export the data to spatial join county in GIS
+library(writexl)
+write_xlsx(GW_Merged9, "02_Raw_Data/GW_Merged_ForGIS.xlsx")
+
+
+
+##### Section 7: Sub-setting data into different category data sets if needed ####
 
 GW_Organic_Contaminants <- GW_Merged7 |> filter(Analyte_Category == "Organic Contaminants")
 
@@ -2285,12 +2690,12 @@ GW_Nutrients <- GW_Merged7 |> filter(Analyte_Category == "Nutrients")
 
 GW_Radioactive <- GW_Merged7 |> filter(Analyte_Category == "Radiochemical")
 
-GW_OtherAnalytes <- GW_Merged7 |> filter(Analyte_Category == "Other Analytes")
+GW_Bacteria <- GW_Merged7 |> filter(Analyte_Category == "Bacteria")
 
 
 
 
-#### Section 8 : Exporting ####
+#### Section 8 : Exporting separate excel files per contmainant type####
 
 # Export into separate excel files
 
@@ -2312,58 +2717,4 @@ write_xlsx(GW_Organic_Contaminants,
 
 
 
-# write.csv(GW_OtherAnalytes,
-#           "02_Raw_Data/GW_OtherAnalytes.csv",
-#           row.names = FALSE)
-# 
-# write.csv()
 
-
-
-
-
-
-
-
-
-
-
-
-# Export to CSV to review analytes
-write.csv(Analytes_1, "02_Raw_Data/Analytes.csv", row.names = FALSE)
-
-# Export to CSV because excel doesn't work for over 1 million observations
-write.csv(GW_MERGED_INTERMEDIATE,
-          "02_Raw_Data/GW_Contaminants_Merged.csv",
-          row.names = FALSE)
-
-
-
-
-#### EXTRA ####
-
-GW_Merged3 <- GW_Merged3 |>  mutate
-
-
-
-
-
-
-
-
-
-
-DF <- DF |>
-  # 1. Group the data by both 'Analyte' and 'County'
-  group_by(Analyte, County) |>
-  # 2. Calculate the desired summary statistics for each group
-  summarise(
-    Mean_Value = mean(YourMeasurementColumn, na.rm = TRUE),
-    Median_Value = median(YourMeasurementColumn, na.rm = TRUE),
-    Min_Value = min(YourMeasurementColumn, na.rm = TRUE),
-    Max_Value = max(YourMeasurementColumn, na.rm = TRUE),
-    SD_Value = sd(YourMeasurementColumn, na.rm = TRUE),
-    N_Observations = n(),
-    # Count the number of observations in each group
-    .groups = 'drop' # This removes the grouping structure after summarising
-  )

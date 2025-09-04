@@ -8,7 +8,6 @@ library(tidyverse)
 
 
 
-
 # Get the original file path
 getwd()
 
@@ -17,16 +16,8 @@ getwd()
 NWQMC_Wells <- read_excel("02_Raw_Data/NWQMC_Wells.xlsx", 
                           col_types = c(rep("guess", 38), "text", rep("guess", 43)))
 
-
-# View all variables and types
-str(NWQMC_Wells)
-
-
-glimpse(NWQMC_Wells)
-
-# View the class of variables
-class(NWQMC_Wells$MonitoringLocationName2)
-class(NWQMC_Wells$ActivityEndDate)
+# # View all variables and types
+# str(NWQMC_Wells)
 
 
 # Turn activity end date into a date
@@ -60,7 +51,7 @@ NWQMC_Wells_Merged_2 <- NWQMC_Wells_Merged_1 |> select(
     OrganizationFormalName,
     ActivityTypeCode,
     ActivityMediaSubdivisionName,
-    ActivityEndDate,
+    ActivityStartDate,
     MonitoringLocationIdentifier,
     MonitoringLocationName,
     SampleAquifer,
@@ -88,10 +79,15 @@ NWQMC_Wells_Merged_2 <- NWQMC_Wells_Merged_1 |> select(
 )
 
 
+
 # Filter out certain values
 NWQMC_Wells_Merged_3 <- NWQMC_Wells_Merged_2 |>
   filter(
-    ActivityTypeCode == "Sample-Routine",!ResultSampleFractionText %in% c("Bed Sediment", "Non-filterable", "Settleable"),!ResultValueTypeName %in% c("Calculated", "Estimated"),!StatisticalBaseCode %in% c("Mean", "Counting Error"),!`ResultMeasure/MeasureUnitCode` %in% c(
+    ActivityTypeCode == "Sample-Routine",
+    !ResultSampleFractionText %in% c("Bed Sediment", "Non-filterable", "Settleable"),
+    !ResultValueTypeName %in% c("Calculated", "Estimated"),
+    !StatisticalBaseCode %in% c("Mean", "Counting Error"),
+    !`ResultMeasure/MeasureUnitCode` %in% c(
       "uS/cm @25C",
       "NTU",
       "% saturatn",
@@ -116,7 +112,8 @@ NWQMC_Wells_Merged_3 <- NWQMC_Wells_Merged_2 |>
       "m3/sec",
       "ft",
       "code"
-    ),!`DetectionQuantitationLimitMeasure/MeasureUnitCode` %in% c(
+    ),
+    !`DetectionQuantitationLimitMeasure/MeasureUnitCode` %in% c(
       "years BP",
       "tons/ac ft",
       "pct modern",
@@ -130,17 +127,20 @@ NWQMC_Wells_Merged_3 <- NWQMC_Wells_Merged_2 |>
       "m3/sec",
       "ft3/s",
       "%"
-    ))
+    )
+  )
 
 
-
+# Filter out values that are NA for result and filter for result condition text equal to certain values
 NWQMC_Wells_Merged_4 <- NWQMC_Wells_Merged_3 |> filter(
   ResultDetectionConditionText %in% c(
     "Not Detected",
     "Present Above Quantification Limit",
     "Detected Not Quantified",
-    "*Non-detect") | is.na(ResultDetectionConditionText),
-  !is.na(ResultMeasureValue))
+    "*Non-detect"
+  ) | is.na(ResultDetectionConditionText),
+  !is.na(ResultMeasureValue)
+)
 # )
 
 
@@ -163,7 +163,7 @@ NWQMC_Wells_Merged_5 <- NWQMC_Wells_Merged_4 |>
 NWQMC_Wells_Merged_6 <- NWQMC_Wells_Merged_5 |> rename(
   SiteID = MonitoringLocationIdentifier,
   Media = ActivityMediaSubdivisionName,
-  Date = ActivityEndDate,
+  Date = ActivityStartDate,
   Analyte = CharacteristicName,
   SampleID = ResultIdentifier,
   Result = ResultMeasureValue,
@@ -199,7 +199,7 @@ NWQMC_Wells_Merged_8 <- NWQMC_Wells_Merged_7 |>  select(
 
 
 # # Making sure there are not duplicates
-unique_rows_NWQMC <- NWQMC_Wells_Merged_8 %>%
+Cleaned_NWQMC <- NWQMC_Wells_Merged_8 %>%
   group_by(SampleID, Analyte, Date) %>%
   distinct() %>%
   ungroup() # Ungroup if you don't need the grouping for subsequent operations
@@ -207,5 +207,5 @@ unique_rows_NWQMC <- NWQMC_Wells_Merged_8 %>%
 
 # Exporting the data
 library(writexl)
-write_xlsx(unique_rows_NWQMC,
-           "02_Raw_Data/NWQMC_Wells_CHECK.xlsx")
+write_xlsx(Cleaned_NWQMC,
+           "02_Raw_Data/Cleaned_NWQMC.xlsx")

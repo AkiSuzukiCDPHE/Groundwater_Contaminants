@@ -20,11 +20,11 @@ ECMC_Merged1 <- left_join(ECMC_Results, ECMC_Samples, by = "SampleID")
 ECMC_Merged2 <- left_join(ECMC_Merged1, ECMC_Locations, by = "FacilityID")
 
 
-# Identifying the NA values for lat/longs
-NAs <- ECMC_Merged2 |> filter(is.na(Latitude83))
-# Idrntifying the unique facility ID's with missing lat longs - 286 found
-FacilityIDs <- as.data.frame(unique(NAs$FacilityID))
-
+# # Identifying the NA values for lat/longs
+# NAs <- ECMC_Merged2 |> filter(is.na(Latitude83))
+# # Idrntifying the unique facility ID's with missing lat longs - 286 found
+# FacilityIDs <- as.data.frame(unique(NAs$FacilityID))
+# 
 
 # Create a new variable for the data source
 ECMC_Merged3 <- ECMC_Merged2 |> mutate(Source = "ECMC Wells", Media = "Groundwater")
@@ -93,26 +93,30 @@ ECMC_Merged5 <- ECMC_Merged4 |> select(
   rename(
     SiteType = `Facility Type`,
     Date = `Sample Date`,
+    SiteID = FacilityID,
     Analyte = ParamDescription ,
     Result = ResultValue,
     Longitude = Longitude83,
     Latitude = Latitude83,
-    Detection_limit=DetectionLimit
+    Detection_Limit=DetectionLimit
   )
+
+
 
 
 ECMC_Merged5$Source <- "ECMC Wells"
 
 # Making sure there are not duplicates
-unique_rows_ECMC <- ECMC_Merged5 %>%
+Cleaned_ECMC <- ECMC_Merged5 %>%
   group_by(SampleID, Analyte, Date) %>%
   distinct() %>%
   ungroup() # Ungroup if you don't need the grouping for subsequent operations
 
 
+unique(Cleaned_ECMC$Units)
 
 
 
 # # # Exporting the data to look at it
 library(writexl)
-write_xlsx(unique_rows_ECMC,"02_Raw_Data/ECMC_Wells_CHECK.xlsx")
+write_xlsx(Cleaned_ECMC,"02_Raw_Data/Cleaned_ECMC.xlsx")

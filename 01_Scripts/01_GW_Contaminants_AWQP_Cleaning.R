@@ -9,7 +9,6 @@ getwd()
 
 # Importing data
 
-AWQP_Original <- read_excel("02_Raw_Data/AWQP_Groundwater.xlsx")
 
 AWQP_Original <- read_excel("02_Raw_Data/AWQP_Groundwater.xlsx",
                             col_types = c(rep("guess", 12), "text", rep("guess", 4)))
@@ -58,17 +57,29 @@ AWQP_Merged_2 <- AWQP_Merged_1 |>  rename (
   Latitude = Lat
 )
 
-# Changing the category for detect/nondetect into a character variable
-AWQP_Merged_2 <- AWQP_Merged_2 |> mutate(NonDetect = case_when(NonDetect == 1 ~ "Not Detected", NonDetect == 0 ~ "Detected")) |>
-  mutate(Qualifier = case_when(Qualifier == 0 ~ NA | Qualifier == 1 ~ U, TRUE ~ Qualifier))
+# Changing the category for Detect/NonDetect and Qualifer into character variables
+AWQP_Merged_3 <- AWQP_Merged_2 |>
+  mutate(
+    NonDetect = case_when(NonDetect == 1 ~ "Not Detected", NonDetect == 0 ~ "Detected"),
+    Qualifier = case_when(
+      Qualifier == 0 ~ NA_character_,
+      # Use NA_character_ for a character NA
+      Qualifier == 1 ~ "U",
+      TRUE ~ as.character(Qualifier)
+    )
+  )
 
 
 # Making sure there are not duplicates
-Cleaned_AWQP <- AWQP_Merged_2 %>%
+Cleaned_AWQP <- AWQP_Merged_3 %>%
   group_by(SiteID) %>%
   distinct() %>%
   ungroup() # Ungroup if you don't need the grouping for subsequent operations
 
+
+# Cleaning up variables before merge
+Cleaned_AWQP$Qualifier <- as.character(Cleaned_AWQP$Qualifier)
+Cleaned_AWQP$Date <- as.Date(Cleaned_AWQP$Date)
 
 
 

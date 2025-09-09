@@ -13,7 +13,7 @@ getwd()
 
 
 # Section 1: Importing data ####
-NWQMC_Wells <- read_excel("02_Raw_Data/NWQMC_Wells.xlsx", 
+NWQMC_Wells <- read_excel("02_Raw_Data/NWQMC_Wells.xlsx",
                           col_types = c(rep("guess", 38), "text", rep("guess", 43)))
 
 # # View all variables and types
@@ -170,11 +170,11 @@ NWQMC_Wells_Merged_6 <- NWQMC_Wells_Merged_5 |> rename(
   Units = `ResultMeasure/MeasureUnitCode`,
   Longitude = LongitudeMeasure,
   Latitude = LatitudeMeasure,
-  Detection_Limit_Type=DetectionQuantitationLimitTypeName, 
+  Detection_Limit_Type = DetectionQuantitationLimitTypeName,
   Detection_Limit = `DetectionQuantitationLimitMeasure/MeasureValue`,
-  Detection_Limit_Unit=`DetectionQuantitationLimitMeasure/MeasureUnitCode`,
+  Detection_Limit_Unit = `DetectionQuantitationLimitMeasure/MeasureUnitCode`,
   Sampling_Length = ResultTimeBasisText,
-  NonDetect=ResultLaboratoryCommentText
+  NonDetect = ResultLaboratoryCommentText
   
 )
 
@@ -190,7 +190,8 @@ NWQMC_Wells_Merged_7 <- NWQMC_Wells_Merged_6 |>
 
 # Remove extraneous variables
 NWQMC_Wells_Merged_8 <- NWQMC_Wells_Merged_7 |>  select(
-  -c(ResultDetectionConditionText,
+  -c(
+    ResultDetectionConditionText,
     ResultValueTypeName,
     MonitoringLocationName,
     `ResultAnalyticalMethod/MethodDescriptionText`
@@ -198,14 +199,19 @@ NWQMC_Wells_Merged_8 <- NWQMC_Wells_Merged_7 |>  select(
 )
 
 
-# # Making sure there are not duplicates
+# Making sure there are not duplicates
 Cleaned_NWQMC <- NWQMC_Wells_Merged_8 %>%
   group_by(SampleID, Analyte, Date) %>%
   distinct() %>%
   ungroup() # Ungroup if you don't need the grouping for subsequent operations
 
+# Cleaning up vairables before merge
+Cleaned_NWQMC$Result <- as.numeric(Cleaned_NWQMC$Result)
+Cleaned_NWQMC$Detection_Limit <- as.numeric(Cleaned_NWQMC$Detection_Limit)
+Cleaned_NWQMC$Date <- as.Date(Cleaned_NWQMC$Date)
+
+
 
 # Exporting the data
 library(writexl)
-write_xlsx(Cleaned_NWQMC,
-           "02_Raw_Data/Cleaned_NWQMC.xlsx")
+write_xlsx(Cleaned_NWQMC, "02_Raw_Data/Cleaned_NWQMC.xlsx")

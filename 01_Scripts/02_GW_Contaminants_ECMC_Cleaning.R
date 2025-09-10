@@ -37,8 +37,8 @@ ECMC_Merged3 <- ECMC_Merged2 |> mutate(Source = "ECMC Wells", Media = "Groundwat
 # Filtering out various values
 ECMC_Merged4 <- ECMC_Merged3 |> filter(
   FractionType != "WW",
-  Matrix != c("GAS", "SOIL"),
-  `Facility Type` != c(
+  !Matrix %in% c("GAS", "SOIL"),
+  !`Facility Type` %in% c(
     "Cistern",
     "Creek",
     "Ditch",
@@ -49,8 +49,9 @@ ECMC_Merged4 <- ECMC_Merged3 |> filter(
     "Surface Water",
     "Tank"
   ),
-  # add in qualifier and unit filtering criteria!grepl(c("<", ">"), Qualifier),
-  Units == c(
+  # add in qualifier and unit filtering criteria!
+  # grepl(c("<", ">"), Qualifier),
+  Units %in% c(
     "ug/L",
     "ug/Kg",
     "ng/L",
@@ -70,6 +71,8 @@ ECMC_Merged4 <- ECMC_Merged3 |> filter(
     "CFU"
   )
 )
+
+
 
 
 # Removes values where result is NA

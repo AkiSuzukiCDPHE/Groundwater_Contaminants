@@ -1,4 +1,4 @@
-#### Section 1 Importing the data ####
+# Section 1 Importing the data ####
 
 # Importing data from an excel workbook
 library(readxl)
@@ -12,7 +12,6 @@ library(tidyverse)
 getwd()
 
 
-# Section 1: Importing data ####
 NWQMC_Wells <- read_excel("02_Raw_Data/NWQMC_Wells.xlsx",
                           col_types = c(rep("guess", 38), "text", rep("guess", 43)))
 
@@ -27,7 +26,7 @@ NWQMC_Wells$ActivityEndDate <- as.Date(NWQMC_Wells$ActivityEndDate, format = "%m
 NWQMC_LatLongs <- read_excel("02_Raw_Data/NWQMC_LatLongs.xlsx")
 
 
-#Section 2: Cleaning the data ####
+# Section 2: Cleaning the data ####
 
 
 # Remove extraneous variables from the lat longs dataset

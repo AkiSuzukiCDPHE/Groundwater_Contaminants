@@ -7,7 +7,7 @@ options(scipen = 999)
 # Summary statistics per contaminant by county using historical data ####
 
 Stats_By_County_Historical <- GW_Contaminants_Historical%>%
-  group_by(COUNTY, Analyte, Units) %>%
+  group_by(COUNTY, Analyte_Category, Analyte_Sub_Category, Analyte, Units) %>%
   summarise(
     min = min(Result, na.rm = TRUE),
     q1 = quantile(Result, 0.25, na.rm = TRUE),
@@ -32,7 +32,7 @@ Stats_By_County_Historical_Export <- Stats_By_County_Historical %>%
 
 # Summary statistics per contaminant by county for only samples taken in the last 20 years ####
 Stats_By_County_Recent <- GW_Contaminants_Recent %>%
-  group_by(COUNTY, Analyte, Units) %>%
+  group_by(COUNTY, Analyte_Category, Analyte_Sub_Category, Analyte, Units) %>%
   summarise(
     min = min(Result, na.rm = TRUE),
     q1 = quantile(Result, 0.25, na.rm = TRUE),

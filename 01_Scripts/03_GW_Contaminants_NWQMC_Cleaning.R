@@ -12,15 +12,15 @@ library(tidyverse)
 getwd()
 
 
-NWQMC_Wells <- read_excel("02_Raw_Data/NWQMC_Wells.xlsx",
-                          col_types = c(rep("guess", 38), "text", rep("guess", 43)))
+NWQMC_Wells <- read_excel("02_Raw_Data/4.27.2026_Query/WQP_4.27.2026.xlsx",
+                          col_types = c(rep("guess", 38), "text", rep("guess", 42)))
 
 # # View all variables and types
 # str(NWQMC_Wells)
 
 
 # Turn activity end date into a date
-NWQMC_Wells$ActivityEndDate <- as.Date(NWQMC_Wells$ActivityEndDate, format = "%m-%d-%Y")
+NWQMC_Wells$ActivityEndDate <- as.Date(NWQMC_Wells$ActivityEndDate, format = "%m/%d/%Y")
 
 # Importing location data
 NWQMC_LatLongs <- read_excel("02_Raw_Data/NWQMC_LatLongs.xlsx")

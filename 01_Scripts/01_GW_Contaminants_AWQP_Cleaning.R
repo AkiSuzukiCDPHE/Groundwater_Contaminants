@@ -9,8 +9,7 @@ getwd()
 
 # Importing data
 
-
-AWQP_Original <- read_excel("02_Raw_Data/AWQP_Groundwater.xlsx",
+AWQP_Original <- read_excel("02_Raw_Data/4.27.2026_Query/ECMC_4.27.2026.xlsx",
                             col_types = c(rep("guess", 12), "text", rep("guess", 4)))
 
 
